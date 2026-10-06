@@ -6,6 +6,7 @@ import Loader from '../../components/shared/Loader';
 import ColdChainStatus from '../../components/temperature/ColdChainStatus';
 import TemperatureHistory from '../../components/temperature/TemperatureHistory';
 import TemperatureChart from '../../components/temperature/TemperatureChart';
+import QRCodeDisplay from '../../components/shared/QRCodeDisplay';
 
 const MEDICINE_STATES = ['Manufactured', 'InStock', 'Sold', 'Expired'];
 
@@ -82,18 +83,21 @@ export default function TrackMedicine() {
       {medicine && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           
-          <div style={{ background: '#f5f5f5', padding: '1rem', borderRadius: '8px' }}>
-            <h3>Basic Details</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-              <div><strong>Medicine ID:</strong> {medicine.basic.medicineId}</div>
-              <div><strong>Name:</strong> {medicine.basic.medicineName}</div>
-              <div><strong>Type:</strong> {medicine.basic.medicineType}</div>
-              <div><strong>Strength:</strong> {medicine.basic.strength}</div>
-              <div><strong>Batch:</strong> {medicine.basic.batchNumber}</div>
-              <div><strong>Storage:</strong> {medicine.basic.storageConditions}</div>
-              <div><strong>Manufacturer ID:</strong> {medicine.basic.manufacturerId}</div>
-              <div><strong>Manufacturer Address:</strong> {medicine.basic.manufacturerAddress}</div>
+          <div style={{ background: '#f5f5f5', padding: '1rem', borderRadius: '8px', display: 'flex', gap: '2rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            <div style={{ flex: 1, minWidth: '280px' }}>
+              <h3>Basic Details</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div><strong>Medicine ID:</strong> {medicine.basic.medicineId}</div>
+                <div><strong>Name:</strong> {medicine.basic.medicineName}</div>
+                <div><strong>Type:</strong> {medicine.basic.medicineType}</div>
+                <div><strong>Strength:</strong> {medicine.basic.strength}</div>
+                <div><strong>Batch:</strong> {medicine.basic.batchNumber}</div>
+                <div><strong>Storage:</strong> {medicine.basic.storageConditions}</div>
+                <div><strong>Manufacturer ID:</strong> {medicine.basic.manufacturerId}</div>
+                <div><strong>Manufacturer Address:</strong> {medicine.basic.manufacturerAddress}</div>
+              </div>
             </div>
+            <QRCodeDisplay value={medicine.basic.medicineId} size={150} />
           </div>
 
           <div style={{ background: '#f5f5f5', padding: '1rem', borderRadius: '8px' }}>

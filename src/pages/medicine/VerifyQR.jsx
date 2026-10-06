@@ -4,6 +4,8 @@ import { parseWeb3Error } from '../../utils/errorParser';
 import Alert from '../../components/shared/Alert';
 import Loader from '../../components/shared/Loader';
 import ColdChainStatus from '../../components/temperature/ColdChainStatus';
+import QRCodeDisplay from '../../components/shared/QRCodeDisplay';
+import QRScanner from '../../components/shared/QRScanner';
 
 const MEDICINE_STATES = ['Manufactured', 'InStock', 'Sold', 'Expired'];
 
@@ -15,21 +17,20 @@ export default function VerifyQR() {
   const [history, setHistory] = useState([]);
   const [verifiedTimestamp, setVerifiedTimestamp] = useState(null);
 
-  const handleVerify = async (e) => {
-    e.preventDefault();
+  const fetchVerification = async (targetId) => {
+    if (!targetId || !targetId.trim()) return;
+
     setError('');
     setMedicine(null);
     setHistory([]);
 
-    if (!medicineId.trim()) return;
-
     try {
       setLoading(true);
-      const medData = await getMedicine(medicineId);
+      const medData = await getMedicine(targetId.trim());
       setMedicine(medData);
 
       try {
-        const histData = await getTemperatureHistory(medicineId);
+        const histData = await getTemperatureHistory(targetId.trim());
         setHistory(histData || []);
       } catch (hErr) {
         console.error("Failed to load history", hErr);
@@ -44,6 +45,16 @@ export default function VerifyQR() {
     }
   };
 
+  const handleVerify = (e) => {
+    e.preventDefault();
+    fetchVerification(medicineId);
+  };
+
+  const handleScan = (scannedValue) => {
+    setMedicineId(scannedValue);
+    fetchVerification(scannedValue);
+  };
+
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem' }}>
       <h2 style={{ textAlign: 'center' }}>Public QR / ID Verification</h2>
@@ -54,19 +65,22 @@ export default function VerifyQR() {
         It does <strong>NOT</strong> guarantee the physical authenticity of the product itself.
       </div>
 
-      <form onSubmit={handleVerify} style={{ display: 'flex', gap: '10px', marginBottom: '2rem', justifyContent: 'center' }}>
-        <input 
-          type="text" 
-          placeholder="Enter Medicine ID (or scan QR)" 
-          value={medicineId} 
-          onChange={(e) => setMedicineId(e.target.value)} 
-          required 
-          style={{ width: '300px', padding: '0.75rem', fontSize: '1rem' }}
-        />
-        <button type="submit" disabled={loading} style={{ padding: '0.75rem 2rem', fontSize: '1rem' }}>
-          {loading ? <Loader /> : 'Verify'}
-        </button>
-      </form>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', marginBottom: '2rem' }}>
+        <form onSubmit={handleVerify} style={{ display: 'flex', gap: '10px', justifyContent: 'center', width: '100%' }}>
+          <input 
+            type="text" 
+            placeholder="Enter Medicine ID (or scan QR)" 
+            value={medicineId} 
+            onChange={(e) => setMedicineId(e.target.value)} 
+            required 
+            style={{ width: '300px', padding: '0.75rem', fontSize: '1rem' }}
+          />
+          <button type="submit" disabled={loading} style={{ padding: '0.75rem 2rem', fontSize: '1rem' }}>
+            {loading ? <Loader /> : 'Verify'}
+          </button>
+        </form>
+        <QRScanner onScan={handleScan} />
+      </div>
 
       {error && <Alert message={error} type="error" />}
 
@@ -78,6 +92,10 @@ export default function VerifyQR() {
           </div>
           <div style={{ textAlign: 'center', color: '#666' }}>
             Verified on: {verifiedTimestamp}
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'center', my: '1rem' }}>
+            <QRCodeDisplay value={medicine.basic.medicineId} size={180} />
           </div>
 
           <hr style={{ width: '100%' }} />

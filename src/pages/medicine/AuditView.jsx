@@ -59,7 +59,7 @@ export default function AuditView() {
       case 'ManufacturerHistoryRecorded':
         return `Manufacturer history recorded. Price: ${vals.price}`;
       case 'MedicinePurchased':
-        return `Purchased by ${vals.buyerId} (Type: ${vals.buyerType === '1' ? 'Wholesaler' : 'Pharmacy'}). Qty: ${vals.quantity}, Price: ${vals.price}`;
+        return `Purchased by ${vals.buyerId} (Type: ${String(vals.buyerType) === '1' ? 'Wholesaler' : 'Pharmacy'}). Qty: ${vals.quantity}, Price: ${vals.price}`;
       case 'SaleHistoryRecorded':
         return `Sale history updated for buyer ${vals.buyerId}.`;
       case 'TemperatureRecorded':
