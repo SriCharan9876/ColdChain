@@ -1,0 +1,1 @@
+export const MEDICINE_STATES = { 0: 'Manufactured', 1: 'InStock', 2: 'Sold', 3: 'Expired' };

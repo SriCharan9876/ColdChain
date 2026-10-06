@@ -1,0 +1,1 @@
+export const parseWeb3Error = (error) => error?.message || 'Unknown error';

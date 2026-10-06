@@ -1,0 +1,4 @@
+export const MEDICINE_CONTRACT_ADDRESS = import.meta.env.VITE_MEDICINE_CONTRACT_ADDRESS;
+export const REGISTRATION_CONTRACT_ADDRESS = import.meta.env.VITE_REGISTRATION_CONTRACT_ADDRESS;
+
+export const TARGET_CHAIN_ID = '0xaa36a7'; // Sepolia Testnet
