@@ -110,40 +110,107 @@ export default function AddMedicine() {
     }
   };
 
-  if (!user) return <div style={{ padding: '2rem' }}>Please login to add a medicine.</div>;
-  if (user.role !== 'Manufacturer') return <div style={{ padding: '2rem' }}>Unauthorized: Only manufacturers can add medicines.</div>;
+  if (!user) return <div className="p-8 text-center text-slate-500">Please login to add a medicine.</div>;
+  if (user.role !== 'Manufacturer') return <div className="p-8 text-center text-red-500">Unauthorized: Only manufacturers can add medicines.</div>;
 
   return (
-    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '2rem' }}>
-      <h2>Add New Medicine</h2>
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Register New Batch</h2>
+        <p className="text-slate-500 mt-1">Add a new medicine batch to the blockchain immutable ledger.</p>
+      </div>
+      
       {error && <Alert message={error} type="error" />}
       {success && <Alert message={success} type="success" />}
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        <input name="manufacturerId" placeholder="Manufacturer ID" value={user.details.id} readOnly disabled />
-        <input name="medicineName" placeholder="Medicine Name" value={formData.medicineName} onChange={handleChange} required />
-        <input name="medicineId" placeholder="Medicine ID (Unique)" value={formData.medicineId} onChange={handleChange} required />
-        <input name="medicineType" placeholder="Medicine Type (e.g., Vaccine)" value={formData.medicineType} onChange={handleChange} required />
-        <input name="strength" placeholder="Strength (e.g., 500mg)" value={formData.strength} onChange={handleChange} required />
-        <input name="batchNumber" placeholder="Batch Number" value={formData.batchNumber} onChange={handleChange} required />
-        <input name="storageConditions" placeholder="Storage Conditions" value={formData.storageConditions} onChange={handleChange} required />
-        
-        <label>Manufacture Date</label>
-        <input name="manufactureDate" type="date" value={formData.manufactureDate} onChange={handleChange} required />
-        
-        <label>Expiry Date</label>
-        <input name="expiryDate" type="date" value={formData.expiryDate} onChange={handleChange} required />
-        
-        <input name="price" type="number" placeholder="Base Price (wei or units)" value={formData.price} onChange={handleChange} required min="0" />
-        <input name="quantity" type="number" placeholder="Quantity" value={formData.quantity} onChange={handleChange} required min="1" />
-        
-        <input name="tempMin" type="number" placeholder="Minimum Temperature (°C)" value={formData.tempMin} onChange={handleChange} required />
-        <input name="tempMax" type="number" placeholder="Maximum Temperature (°C)" value={formData.tempMax} onChange={handleChange} required />
+      <div className="card">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="md:col-span-2">
+              <h3 className="text-lg font-semibold text-slate-800 mb-3 pb-2 border-b border-slate-100">Basic Information</h3>
+            </div>
+            
+            <div>
+              <label className="label-text">Manufacturer ID</label>
+              <input name="manufacturerId" value={user.details.id} readOnly disabled className="input-field bg-slate-50 text-slate-500 cursor-not-allowed" />
+            </div>
+            <div>
+              <label className="label-text">Medicine ID (Unique QR identifier)</label>
+              <input name="medicineId" placeholder="e.g. MED-2023-XYZ" value={formData.medicineId} onChange={handleChange} required className="input-field" />
+            </div>
+            
+            <div>
+              <label className="label-text">Medicine Name</label>
+              <input name="medicineName" placeholder="e.g. Amoxicillin" value={formData.medicineName} onChange={handleChange} required className="input-field" />
+            </div>
+            <div>
+              <label className="label-text">Medicine Type</label>
+              <input name="medicineType" placeholder="e.g. Vaccine, Antibiotic" value={formData.medicineType} onChange={handleChange} required className="input-field" />
+            </div>
+            
+            <div>
+              <label className="label-text">Strength</label>
+              <input name="strength" placeholder="e.g. 500mg" value={formData.strength} onChange={handleChange} required className="input-field" />
+            </div>
+            <div>
+              <label className="label-text">Batch Number</label>
+              <input name="batchNumber" placeholder="e.g. BT-9921" value={formData.batchNumber} onChange={handleChange} required className="input-field" />
+            </div>
+          </div>
 
-        <button type="submit" disabled={loading || !account || !isCorrectNetwork}>
-          {loading ? <Loader /> : 'Add Medicine'}
-        </button>
-      </form>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <div className="md:col-span-2">
+              <h3 className="text-lg font-semibold text-slate-800 mb-3 pb-2 border-b border-slate-100">Lifecycle & Financial</h3>
+            </div>
+            
+            <div>
+              <label className="label-text">Manufacture Date</label>
+              <input name="manufactureDate" type="date" value={formData.manufactureDate} onChange={handleChange} required className="input-field" />
+            </div>
+            <div>
+              <label className="label-text">Expiry Date</label>
+              <input name="expiryDate" type="date" value={formData.expiryDate} onChange={handleChange} required className="input-field" />
+            </div>
+            
+            <div>
+              <label className="label-text">Quantity (units)</label>
+              <input name="quantity" type="number" placeholder="e.g. 1000" value={formData.quantity} onChange={handleChange} required min="1" className="input-field" />
+            </div>
+            <div>
+              <label className="label-text">Base Price (wei)</label>
+              <input name="price" type="number" placeholder="e.g. 10000000000" value={formData.price} onChange={handleChange} required min="0" className="input-field" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 bg-secondary-50 p-6 rounded-xl border border-secondary-100">
+            <div className="md:col-span-2">
+              <h3 className="text-lg font-semibold text-secondary-800 mb-1">Cold Chain Requirements</h3>
+              <p className="text-sm text-secondary-600 mb-4">Set strict temperature boundaries. Excursions will be permanently logged.</p>
+            </div>
+            
+            <div className="md:col-span-2">
+              <label className="label-text text-secondary-800">Storage Conditions Description</label>
+              <input name="storageConditions" placeholder="e.g. Keep refrigerated, do not freeze" value={formData.storageConditions} onChange={handleChange} required className="input-field" />
+            </div>
+            
+            <div>
+              <label className="label-text text-secondary-800">Minimum Temperature (°C)</label>
+              <input name="tempMin" type="number" placeholder="e.g. 2" value={formData.tempMin} onChange={handleChange} required className="input-field border-secondary-200 focus:ring-secondary-500" />
+            </div>
+            <div>
+              <label className="label-text text-secondary-800">Maximum Temperature (°C)</label>
+              <input name="tempMax" type="number" placeholder="e.g. 8" value={formData.tempMax} onChange={handleChange} required className="input-field border-secondary-200 focus:ring-secondary-500" />
+            </div>
+          </div>
+
+          <div className="pt-4 flex justify-end">
+            <button type="submit" disabled={loading || !account || !isCorrectNetwork} className="btn-primary px-8 py-2.5">
+              {loading ? <Loader /> : 'Register Batch to Blockchain'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

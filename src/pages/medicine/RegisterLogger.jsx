@@ -50,36 +50,59 @@ export default function RegisterLogger() {
   };
 
   if (!user || user.role !== 'Manufacturer') {
-    return <div style={{ padding: '2rem' }}>Unauthorized: Only manufacturers can register loggers.</div>;
+    return <div className="p-8 text-center text-red-500">Unauthorized: Only manufacturers can register loggers.</div>;
   }
 
   return (
-    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '2rem' }}>
-      <h2>Register Logger</h2>
-      <p>Assign a MetaMask wallet address as the authorized temperature logger for a specific medicine batch.</p>
+    <div className="max-w-2xl mx-auto space-y-6 mt-8">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Register IoT Logger</h2>
+        <p className="text-slate-500 mt-2">Assign a wallet address as the authorized temperature logger for a batch.</p>
+      </div>
       
       {error && <Alert message={error} type="error" />}
       {success && <Alert message={success} type="success" />}
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        <input 
-          type="text" 
-          placeholder="Medicine ID" 
-          value={medicineId} 
-          onChange={(e) => setMedicineId(e.target.value)} 
-          required 
-        />
-        <input 
-          type="text" 
-          placeholder="Logger Ethereum Address (0x...)" 
-          value={loggerAddress} 
-          onChange={(e) => setLoggerAddress(e.target.value)} 
-          required 
-        />
-        <button type="submit" disabled={loading || !account}>
-          {loading ? <Loader /> : 'Register Logger'}
-        </button>
-      </form>
+      <div className="card">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="label-text">Medicine ID</label>
+            <input 
+              type="text" 
+              placeholder="e.g. MED-2023-XYZ" 
+              value={medicineId} 
+              onChange={(e) => setMedicineId(e.target.value)} 
+              required 
+              className="input-field"
+            />
+          </div>
+          <div>
+            <label className="label-text">Logger Ethereum Address</label>
+            <input 
+              type="text" 
+              placeholder="0x..." 
+              value={loggerAddress} 
+              onChange={(e) => setLoggerAddress(e.target.value)} 
+              required 
+              className="input-field font-mono text-sm"
+            />
+            <p className="text-xs text-slate-500 mt-1.5">This address will have exclusive permission to submit temperature readings for this batch.</p>
+          </div>
+          <div className="pt-2">
+            <button type="submit" disabled={loading || !account} className="btn-primary w-full py-3">
+              {loading ? <Loader /> : 'Authorize Logger'}
+            </button>
+          </div>
+        </form>
+      </div>
+      
+      <div className="bg-secondary-50 border border-secondary-100 rounded-xl p-4 text-sm text-secondary-800 flex gap-3 items-start">
+        <div className="mt-0.5 text-lg">ℹ️</div>
+        <div>
+          <strong className="block mb-1">How it works</strong>
+          <p className="text-secondary-700/80">In a production environment, this address typically belongs to an automated IoT gateway or proxy server that securely signs transactions on behalf of physical temperature sensors in the delivery vehicle or warehouse.</p>
+        </div>
+      </div>
     </div>
   );
 }

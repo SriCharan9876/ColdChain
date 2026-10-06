@@ -60,18 +60,46 @@ export default function Login() {
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '0 auto', padding: '2rem' }}>
-      <h2>Login</h2>
-      {error && <Alert message={error} type="error" />}
-      
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        <input name="email" type="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
-        <input name="password" type="password" placeholder="Password" value={formData.password} onChange={handleChange} required />
+    <div className="max-w-md mx-auto mt-10">
+      <div className="card">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl text-primary-600 font-bold mb-2">Welcome Back</h2>
+          <p className="text-slate-500 text-sm">Access your cold chain dashboard</p>
+        </div>
         
-        <button type="submit" disabled={loading}>
-          {loading ? <Loader /> : 'Login'}
-        </button>
-      </form>
+        {error && <Alert message={error} type="error" />}
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="label-text">Email Address</label>
+            <input 
+              name="email" 
+              type="email" 
+              placeholder="name@company.com" 
+              value={formData.email} 
+              onChange={handleChange} 
+              required 
+              className="input-field"
+            />
+          </div>
+          <div>
+            <label className="label-text">Password</label>
+            <input 
+              name="password" 
+              type="password" 
+              placeholder="••••••••" 
+              value={formData.password} 
+              onChange={handleChange} 
+              required 
+              className="input-field"
+            />
+          </div>
+          
+          <button type="submit" disabled={loading} className="btn-primary w-full mt-4 flex justify-center">
+            {loading ? <Loader /> : 'Sign In'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

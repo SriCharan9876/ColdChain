@@ -73,74 +73,108 @@ export default function AuditView() {
     }
   };
 
-  const getEventColor = (eventName) => {
-    if (eventName === 'TemperatureExcursion') return '#ffebee'; // red
-    if (eventName === 'MedicinePurchased' || eventName === 'SaleHistoryRecorded') return '#e3f2fd'; // blue
-    if (eventName === 'MedicineAdded') return '#e8f5e9'; // green
-    if (eventName === 'TemperatureRecorded') return '#fff3e0'; // orange
-    return '#f5f5f5'; // grey
+  const getEventStyle = (eventName) => {
+    switch (eventName) {
+      case 'TemperatureExcursion': return 'bg-red-50 border-red-200 text-red-800 border-l-4 border-l-red-500';
+      case 'MedicinePurchased':
+      case 'SaleHistoryRecorded': return 'bg-blue-50 border-blue-200 text-blue-800 border-l-4 border-l-blue-500';
+      case 'MedicineAdded': return 'bg-green-50 border-green-200 text-green-800 border-l-4 border-l-green-500';
+      case 'TemperatureRecorded': return 'bg-orange-50 border-orange-200 text-orange-800 border-l-4 border-l-orange-500';
+      case 'MedicineStateUpdated': return 'bg-purple-50 border-purple-200 text-purple-800 border-l-4 border-l-purple-500';
+      default: return 'bg-slate-50 border-slate-200 text-slate-800 border-l-4 border-l-slate-400';
+    }
+  };
+
+  const getEventIcon = (eventName) => {
+    switch (eventName) {
+      case 'TemperatureExcursion': return '⚠️';
+      case 'MedicinePurchased':
+      case 'SaleHistoryRecorded': return '💸';
+      case 'MedicineAdded': return '📦';
+      case 'TemperatureRecorded': return '🌡️';
+      case 'MedicineStateUpdated': return '🔄';
+      default: return '📝';
+    }
   };
 
   return (
-    <div style={{ maxWidth: '900px', margin: '0 auto', padding: '2rem' }}>
-      <h2>Regulator / Audit View</h2>
-      <p style={{ color: '#666' }}>
-        <strong>READ ONLY:</strong> This view compiles a complete, chronological blockchain audit trail of all transactions and state changes for a given batch.
-      </p>
+    <div className="max-w-5xl mx-auto space-y-6 mt-8">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Regulator / Audit View</h2>
+        <p className="text-slate-500 mt-2 max-w-2xl mx-auto">
+          <strong className="text-slate-700">READ ONLY:</strong> This view compiles a complete, chronological blockchain audit trail of all transactions and state changes for a given batch.
+        </p>
+      </div>
       
-      <form onSubmit={handleAudit} style={{ display: 'flex', gap: '10px', marginBottom: '2rem' }}>
-        <input 
-          type="text" 
-          placeholder="Enter Medicine ID" 
-          value={medicineId} 
-          onChange={(e) => setMedicineId(e.target.value)} 
-          required 
-          style={{ flex: 1, padding: '0.75rem' }}
-        />
-        <button type="submit" disabled={loading} style={{ padding: '0.75rem 2rem' }}>
-          {loading ? <Loader /> : 'Run Audit'}
-        </button>
-      </form>
+      <div className="card">
+        <form onSubmit={handleAudit} className="flex flex-col sm:flex-row gap-3">
+          <input 
+            type="text" 
+            placeholder="Enter Medicine ID" 
+            value={medicineId} 
+            onChange={(e) => setMedicineId(e.target.value)} 
+            required 
+            className="input-field flex-1 text-lg py-3"
+          />
+          <button type="submit" disabled={loading} className="btn-primary whitespace-nowrap min-w-[140px] flex justify-center py-3 text-lg">
+            {loading ? <Loader /> : 'Run Audit'}
+          </button>
+        </form>
+      </div>
 
       {error && <Alert message={error} type="error" />}
 
       {medicine && (
-        <div style={{ marginBottom: '2rem', padding: '1rem', borderLeft: '4px solid #3f51b5', background: '#f5f5f5' }}>
-          <h3>Audit Target: {medicine.basic.medicineName}</h3>
-          <p><strong>Batch:</strong> {medicine.basic.batchNumber} | <strong>Current Qty:</strong> {medicine.spec.quantity.toString()}</p>
+        <div className="bg-primary-50 border-l-4 border-primary-500 p-6 rounded-r-lg shadow-sm animate-in fade-in">
+          <h3 className="text-xl font-bold text-primary-900 mb-2">Audit Target: <span className="font-semibold text-primary-700">{medicine.basic.medicineName}</span></h3>
+          <div className="flex gap-6 text-primary-800">
+            <p><strong>Batch:</strong> {medicine.basic.batchNumber}</p>
+            <p><strong>Current Qty:</strong> {medicine.spec.quantity.toString()}</p>
+          </div>
         </div>
       )}
 
       {events.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <h3>Event History ({events.length} records)</h3>
-          {events.map((ev, index) => (
-            <div key={index} style={{ 
-              padding: '1rem', 
-              borderRadius: '8px', 
-              border: '1px solid #ddd',
-              background: getEventColor(ev.event)
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                <strong style={{ fontSize: '1.1rem' }}>{ev.event}</strong>
-                <span style={{ fontSize: '0.9rem', color: '#555' }}>
-                  Block: {String(ev.blockNumber)} 
-                  {ev.returnValues.timestamp && ` | Time: ${new Date(Number(String(ev.returnValues.timestamp)) * 1000).toLocaleString()}`}
-                </span>
+        <div className="space-y-4 mt-8 animate-in slide-in-from-bottom-4 duration-500">
+          <div className="flex items-center justify-between border-b border-slate-200 pb-2 mb-4">
+            <h3 className="text-xl font-bold text-slate-900">Event History</h3>
+            <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-sm font-semibold">{events.length} records</span>
+          </div>
+          
+          <div className="space-y-4">
+            {events.map((ev, index) => (
+              <div key={index} className={`p-5 rounded-lg border shadow-sm transition-all hover:shadow-md ${getEventStyle(ev.event)}`}>
+                <div className="flex justify-between items-start mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">{getEventIcon(ev.event)}</span>
+                    <strong className="text-lg font-bold">{ev.event}</strong>
+                  </div>
+                  <div className="text-right text-sm opacity-80">
+                    <div className="font-mono bg-white/50 px-2 py-0.5 rounded text-xs mb-1">Block: {String(ev.blockNumber)}</div>
+                    {ev.returnValues.timestamp && (
+                      <div className="font-medium">{new Date(Number(String(ev.returnValues.timestamp)) * 1000).toLocaleString()}</div>
+                    )}
+                  </div>
+                </div>
+                <div className="my-3 text-base leading-relaxed font-medium">
+                  {renderEventDetails(ev)}
+                </div>
+                <div className="mt-4 pt-3 border-t border-black/10 flex items-center justify-between text-xs opacity-70 font-mono">
+                  <span className="truncate pr-4" title={ev.transactionHash}>Tx: {ev.transactionHash}</span>
+                  <a href={`https://sepolia.etherscan.io/tx/${ev.transactionHash}`} target="_blank" rel="noreferrer" className="hover:underline whitespace-nowrap flex items-center gap-1">
+                    Etherscan <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                  </a>
+                </div>
               </div>
-              <div style={{ color: '#333' }}>
-                {renderEventDetails(ev)}
-              </div>
-              <div style={{ fontSize: '0.8rem', color: '#888', marginTop: '0.5rem', wordBreak: 'break-all' }}>
-                Tx: {ev.transactionHash}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
 
       {!loading && !error && events.length === 0 && medicine && (
-        <p>No events found for this ID.</p>
+        <div className="text-center p-12 card border-dashed">
+          <p className="text-slate-500 text-lg">No events found for this ID.</p>
+        </div>
       )}
     </div>
   );

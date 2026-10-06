@@ -61,68 +61,104 @@ export default function TrackMedicine() {
   };
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '1000px', margin: '0 auto' }}>
-      <h2>Track Medicine</h2>
+    <div className="max-w-6xl mx-auto space-y-6">
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Track Medicine</h2>
+        <p className="text-slate-500 mt-1">Enter a Medicine ID to view its complete lifecycle and cold-chain status.</p>
+      </div>
       
-      <form onSubmit={handleSearch} style={{ display: 'flex', gap: '10px', marginBottom: '2rem' }}>
-        <input 
-          type="text" 
-          placeholder="Enter Medicine ID" 
-          value={medicineId} 
-          onChange={(e) => setMedicineId(e.target.value)} 
-          required 
-          style={{ flex: 1, padding: '0.5rem' }}
-        />
-        <button type="submit" disabled={loading} style={{ padding: '0.5rem 1rem' }}>
-          {loading ? <Loader /> : 'Search'}
-        </button>
-      </form>
+      <div className="card">
+        <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
+          <input 
+            type="text" 
+            placeholder="e.g. MED-2023-XYZ" 
+            value={medicineId} 
+            onChange={(e) => setMedicineId(e.target.value)} 
+            required 
+            className="input-field flex-1"
+          />
+          <button type="submit" disabled={loading} className="btn-primary whitespace-nowrap min-w-[150px] flex justify-center py-2.5">
+            {loading ? <Loader /> : 'Track Batch'}
+          </button>
+        </form>
+      </div>
 
       {error && <Alert message={error} type="error" />}
 
       {medicine && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+        <div className="space-y-6 animate-in fade-in duration-300">
           
-          <div style={{ background: '#f5f5f5', padding: '1rem', borderRadius: '8px', display: 'flex', gap: '2rem', flexWrap: 'wrap', alignItems: 'center' }}>
-            <div style={{ flex: 1, minWidth: '280px' }}>
-              <h3>Basic Details</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <div><strong>Medicine ID:</strong> {medicine.basic.medicineId}</div>
-                <div><strong>Name:</strong> {medicine.basic.medicineName}</div>
-                <div><strong>Type:</strong> {medicine.basic.medicineType}</div>
-                <div><strong>Strength:</strong> {medicine.basic.strength}</div>
-                <div><strong>Batch:</strong> {medicine.basic.batchNumber}</div>
-                <div><strong>Storage:</strong> {medicine.basic.storageConditions}</div>
-                <div><strong>Manufacturer ID:</strong> {medicine.basic.manufacturerId}</div>
-                <div><strong>Manufacturer Address:</strong> {medicine.basic.manufacturerAddress}</div>
+          <div className="card bg-white flex flex-col md:flex-row gap-8 items-center border-t-4 border-primary-500">
+            <div className="flex-1 w-full">
+              <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                <svg className="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Basic Details
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8">
+                <div><span className="text-slate-500 text-sm block mb-1">Medicine ID</span><strong className="text-slate-900">{medicine.basic.medicineId}</strong></div>
+                <div><span className="text-slate-500 text-sm block mb-1">Name</span><strong className="text-slate-900">{medicine.basic.medicineName}</strong></div>
+                <div><span className="text-slate-500 text-sm block mb-1">Type</span><strong className="text-slate-900">{medicine.basic.medicineType}</strong></div>
+                <div><span className="text-slate-500 text-sm block mb-1">Strength</span><strong className="text-slate-900">{medicine.basic.strength}</strong></div>
+                <div><span className="text-slate-500 text-sm block mb-1">Batch</span><strong className="text-slate-900">{medicine.basic.batchNumber}</strong></div>
+                <div><span className="text-slate-500 text-sm block mb-1">Storage</span><strong className="text-slate-900">{medicine.basic.storageConditions}</strong></div>
+                <div><span className="text-slate-500 text-sm block mb-1">Manufacturer ID</span><strong className="text-slate-900 text-sm font-mono bg-slate-100 px-1 rounded">{medicine.basic.manufacturerId}</strong></div>
+                <div><span className="text-slate-500 text-sm block mb-1">Address</span><strong className="text-slate-900 text-xs font-mono truncate block" title={medicine.basic.manufacturerAddress}>{medicine.basic.manufacturerAddress}</strong></div>
               </div>
             </div>
-            <QRCodeDisplay value={medicine.basic.medicineId} size={150} />
+            <div className="shrink-0 p-4 bg-slate-50 rounded-xl border border-slate-200">
+              <QRCodeDisplay value={medicine.basic.medicineId} size={150} />
+            </div>
           </div>
 
-          <div style={{ background: '#f5f5f5', padding: '1rem', borderRadius: '8px' }}>
-            <h3>Specifications & Lifecycle</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-              <div><strong>State:</strong> {MEDICINE_STATES[Number(medicine.spec.state)]}</div>
-              <div><strong>Quantity:</strong> {medicine.spec.quantity.toString()}</div>
-              <div><strong>Price:</strong> {medicine.spec.price.toString()}</div>
-              <div><strong>Manufacture Date:</strong> {formatTimestamp(medicine.spec.manufactureDate)}</div>
-              <div><strong>Expiry Date:</strong> {formatTimestamp(medicine.spec.expiryDate)}</div>
-              <div><strong>Temp Range:</strong> {medicine.spec.tempMin.toString()}°C to {medicine.spec.tempMax.toString()}°C</div>
-              <div><strong>Registered Logger:</strong> {logger && logger !== '0x0000000000000000000000000000000000000000' ? logger : 'None'}</div>
+          <div className="card">
+            <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+              <svg className="w-5 h-5 text-secondary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+              Specifications & Lifecycle
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                <span className="text-slate-500 text-sm block mb-1">State</span>
+                <span className="inline-flex px-2.5 py-1 rounded-full text-sm font-medium bg-secondary-100 text-secondary-800">
+                  {MEDICINE_STATES[Number(medicine.spec.state)]}
+                </span>
+              </div>
+              <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                <span className="text-slate-500 text-sm block mb-1">Quantity Available</span>
+                <strong className="text-lg text-slate-900">{medicine.spec.quantity.toString()}</strong>
+              </div>
+              <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                <span className="text-slate-500 text-sm block mb-1">Price (wei)</span>
+                <strong className="text-lg text-slate-900">{medicine.spec.price.toString()}</strong>
+              </div>
+              <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                <span className="text-slate-500 text-sm block mb-1">Manufacture Date</span>
+                <strong className="text-slate-900">{formatTimestamp(medicine.spec.manufactureDate)}</strong>
+              </div>
+              <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                <span className="text-slate-500 text-sm block mb-1">Expiry Date</span>
+                <strong className="text-slate-900">{formatTimestamp(medicine.spec.expiryDate)}</strong>
+              </div>
+              <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                <span className="text-slate-500 text-sm block mb-1">Temp Range</span>
+                <strong className="text-slate-900">{medicine.spec.tempMin.toString()}°C to {medicine.spec.tempMax.toString()}°C</strong>
+              </div>
+              <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 md:col-span-3">
+                <span className="text-slate-500 text-sm block mb-1">Registered IoT Logger Address</span>
+                <strong className="text-slate-900 font-mono text-sm break-all">{logger && logger !== '0x0000000000000000000000000000000000000000' ? logger : 'None'}</strong>
+              </div>
             </div>
           </div>
 
           <ColdChainStatus history={history} tempMin={Number(medicine.spec.tempMin)} tempMax={Number(medicine.spec.tempMax)} />
           
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-            <div style={{ background: '#f5f5f5', padding: '1rem', borderRadius: '8px' }}>
-              <h3>Temperature Chart</h3>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="card">
+              <h3 className="text-lg font-bold text-slate-900 mb-4">Temperature Chart</h3>
               <TemperatureChart history={history} tempMin={Number(medicine.spec.tempMin)} tempMax={Number(medicine.spec.tempMax)} />
             </div>
             
-            <div style={{ background: '#f5f5f5', padding: '1rem', borderRadius: '8px' }}>
-              <h3>Temperature History</h3>
+            <div className="card max-h-[500px] overflow-y-auto">
+              <h3 className="text-lg font-bold text-slate-900 mb-4 sticky top-0 bg-white z-10 pb-2 border-b border-slate-100">Temperature History</h3>
               <TemperatureHistory history={history} tempMin={Number(medicine.spec.tempMin)} tempMax={Number(medicine.spec.tempMax)} />
             </div>
           </div>

@@ -79,45 +79,105 @@ export default function Register() {
   };
 
   return (
-    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '2rem' }}>
-      <h2>Register</h2>
-      {error && <Alert message={error} type="error" />}
-      {success && <Alert message={success} type="success" />}
-      
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        <input name="id" placeholder="ID" value={formData.id} onChange={handleChange} required />
-        <input name="firstName" placeholder="First Name" value={formData.firstName} onChange={handleChange} required />
-        <input name="lastName" placeholder="Last Name" value={formData.lastName} onChange={handleChange} required />
-        <input name="email" type="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
-        <input name="phone" placeholder="Phone (10 digits)" value={formData.phone} onChange={handleChange} required minLength={10} maxLength={10} />
+    <div className="max-w-2xl mx-auto mt-8">
+      <div className="card">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl text-primary-600 font-bold mb-2">Create Account</h2>
+          <p className="text-slate-500 text-sm">Join the Cold Chain System</p>
+        </div>
         
-        <select name="role" value={formData.role} onChange={handleChange}>
-          <option value="Manufacturer">Manufacturer</option>
-          <option value="Wholesaler">Wholesaler</option>
-          <option value="Distributor">Distributor</option>
-          <option value="Pharmacy">Pharmacy</option>
-          <option value="Customer">Customer</option>
-        </select>
+        {error && <Alert message={error} type="error" />}
+        {success && <Alert message={success} type="success" />}
         
-        <input name="password" type="password" placeholder="Password (min 8 chars)" value={formData.password} onChange={handleChange} required minLength={8} />
-        
-        <fieldset>
-          <legend>Address</legend>
-          <input name="street" placeholder="Street" value={formData.street} onChange={handleChange} required />
-          <input name="city" placeholder="City" value={formData.city} onChange={handleChange} required />
-          <input name="state" placeholder="State" value={formData.state} onChange={handleChange} required />
-          <input name="zip" placeholder="Zip Code" value={formData.zip} onChange={handleChange} required />
-        </fieldset>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          
+          {/* Personal Details */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="label-text">User ID</label>
+              <input name="id" placeholder="e.g. WH-101" value={formData.id} onChange={handleChange} required className="input-field" />
+            </div>
+            <div>
+              <label className="label-text">Role</label>
+              <select name="role" value={formData.role} onChange={handleChange} className="input-field">
+                <option value="Manufacturer">Manufacturer</option>
+                <option value="Wholesaler">Wholesaler</option>
+                <option value="Distributor">Distributor</option>
+                <option value="Pharmacy">Pharmacy</option>
+                <option value="Customer">Customer</option>
+              </select>
+            </div>
+            
+            <div>
+              <label className="label-text">First Name</label>
+              <input name="firstName" placeholder="John" value={formData.firstName} onChange={handleChange} required className="input-field" />
+            </div>
+            <div>
+              <label className="label-text">Last Name</label>
+              <input name="lastName" placeholder="Doe" value={formData.lastName} onChange={handleChange} required className="input-field" />
+            </div>
+            
+            <div>
+              <label className="label-text">Email</label>
+              <input name="email" type="email" placeholder="john@example.com" value={formData.email} onChange={handleChange} required className="input-field" />
+            </div>
+            <div>
+              <label className="label-text">Phone</label>
+              <input name="phone" placeholder="10-digit number" value={formData.phone} onChange={handleChange} required minLength={10} maxLength={10} className="input-field" />
+            </div>
+            
+            <div className="md:col-span-2">
+              <label className="label-text">Password</label>
+              <input name="password" type="password" placeholder="Min 8 characters" value={formData.password} onChange={handleChange} required minLength={8} className="input-field" />
+            </div>
+          </div>
 
-        <label>
-          <input name="terms" type="checkbox" checked={formData.terms} onChange={handleChange} />
-          I accept terms and conditions
-        </label>
-        
-        <button type="submit" disabled={loading}>
-          {loading ? <Loader /> : 'Register'}
-        </button>
-      </form>
+          <hr className="border-slate-200" />
+          
+          {/* Address Details */}
+          <div>
+            <h3 className="text-lg font-semibold text-slate-800 mb-4">Address Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                <label className="label-text">Street Address</label>
+                <input name="street" placeholder="123 Main St" value={formData.street} onChange={handleChange} required className="input-field" />
+              </div>
+              <div>
+                <label className="label-text">City</label>
+                <input name="city" placeholder="City" value={formData.city} onChange={handleChange} required className="input-field" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="label-text">State</label>
+                  <input name="state" placeholder="State" value={formData.state} onChange={handleChange} required className="input-field" />
+                </div>
+                <div>
+                  <label className="label-text">Zip</label>
+                  <input name="zip" placeholder="Zip Code" value={formData.zip} onChange={handleChange} required className="input-field" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 mt-4">
+            <input 
+              name="terms" 
+              type="checkbox" 
+              id="terms-checkbox"
+              checked={formData.terms} 
+              onChange={handleChange} 
+              className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 cursor-pointer"
+            />
+            <label htmlFor="terms-checkbox" className="text-sm text-slate-600 cursor-pointer">
+              I accept the <span className="text-primary-600 font-medium">Terms and Conditions</span>
+            </label>
+          </div>
+          
+          <button type="submit" disabled={loading} className="btn-primary w-full flex justify-center py-2.5 mt-2">
+            {loading ? <Loader /> : 'Create Account'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

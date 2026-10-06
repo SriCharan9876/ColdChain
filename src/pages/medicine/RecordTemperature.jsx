@@ -69,56 +69,83 @@ export default function RecordTemperature() {
   };
 
   return (
-    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '2rem' }}>
-      <h2>Record Temperature</h2>
-      <p>Submit temperature readings as an authorized logger.</p>
+    <div className="max-w-2xl mx-auto space-y-6 mt-8">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Record Temperature</h2>
+        <p className="text-slate-500 mt-2">Submit temperature readings as an authorized IoT logger.</p>
+      </div>
       
       {error && <Alert message={error} type="error" />}
       {success && <Alert message={success} type="success" />}
 
-      <form onSubmit={handleFetchMedicine} style={{ display: 'flex', gap: '10px', marginBottom: '2rem' }}>
-        <input 
-          type="text" 
-          placeholder="Medicine ID" 
-          value={medicineId} 
-          onChange={(e) => setMedicineId(e.target.value)} 
-          required 
-          style={{ flex: 1 }}
-        />
-        <button type="submit" disabled={fetchLoading}>
-          {fetchLoading ? <Loader /> : 'Find Medicine'}
-        </button>
-      </form>
-
-      {medicine && (
-        <div style={{ background: '#f5f5f5', padding: '1rem', borderRadius: '8px', marginBottom: '2rem' }}>
-          <h3>Medicine Details</h3>
-          <p><strong>Name:</strong> {medicine.basic.medicineName}</p>
-          <p><strong>Configured Range:</strong> {medicine.spec.tempMin.toString()}°C to {medicine.spec.tempMax.toString()}°C</p>
-          <p>
-            <strong>Registered Logger:</strong> {loggerAddress} 
-            {account && account.toLowerCase() === loggerAddress.toLowerCase() 
-              ? <span style={{ color: 'green', marginLeft: '10px', fontWeight: 'bold' }}>✓ You are authorized</span>
-              : <span style={{ color: 'red', marginLeft: '10px', fontWeight: 'bold' }}>✗ You are not authorized</span>
-            }
-          </p>
-        </div>
-      )}
-
-      {medicine && (
-        <form onSubmit={handleRecord} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <label><strong>Temperature Reading (°C):</strong></label>
+      <div className="card">
+        <form onSubmit={handleFetchMedicine} className="flex flex-col sm:flex-row gap-3">
           <input 
-            type="number" 
-            placeholder="Enter temperature (e.g., 5, -2, 10)" 
-            value={temperature} 
-            onChange={(e) => setTemperature(e.target.value)} 
+            type="text" 
+            placeholder="Enter Medicine ID" 
+            value={medicineId} 
+            onChange={(e) => setMedicineId(e.target.value)} 
             required 
+            className="input-field flex-1"
           />
-          <button type="submit" disabled={submitLoading || !account || account.toLowerCase() !== loggerAddress.toLowerCase()}>
-            {submitLoading ? <Loader /> : 'Submit Reading'}
+          <button type="submit" disabled={fetchLoading} className="btn-primary whitespace-nowrap min-w-[140px] flex justify-center py-2.5">
+            {fetchLoading ? <Loader /> : 'Find Medicine'}
           </button>
         </form>
+      </div>
+
+      {medicine && (
+        <div className="card space-y-6 animate-in fade-in duration-300">
+          <div className="bg-slate-50 p-6 rounded-lg border border-slate-100">
+            <h3 className="text-lg font-bold text-slate-900 mb-4 border-b border-slate-200 pb-2">Medicine Details</h3>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-slate-500 text-sm">Name</span>
+                <span className="font-medium text-slate-900">{medicine.basic.medicineName}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-slate-500 text-sm">Configured Range</span>
+                <span className="font-medium text-slate-900">{medicine.spec.tempMin.toString()}°C to {medicine.spec.tempMax.toString()}°C</span>
+              </div>
+              <div className="pt-3 mt-3 border-t border-slate-200">
+                <span className="text-slate-500 text-sm block mb-1">Registered Logger</span>
+                <div className="flex items-center justify-between gap-4">
+                  <code className="text-xs font-mono bg-slate-200 text-slate-700 px-2 py-1 rounded break-all">{loggerAddress}</code>
+                  {account && account.toLowerCase() === loggerAddress.toLowerCase() 
+                    ? <span className="inline-flex items-center gap-1 text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded whitespace-nowrap">✓ Authorized</span>
+                    : <span className="inline-flex items-center gap-1 text-xs font-bold text-red-600 bg-red-50 px-2 py-1 rounded whitespace-nowrap">✗ Unauthorized</span>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <form onSubmit={handleRecord} className="space-y-4">
+            <div>
+              <label className="label-text">Temperature Reading (°C)</label>
+              <div className="relative">
+                <input 
+                  type="number" 
+                  placeholder="e.g. 5" 
+                  value={temperature} 
+                  onChange={(e) => setTemperature(e.target.value)} 
+                  required 
+                  className="input-field text-xl py-3 pl-4 pr-12 font-medium"
+                />
+                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                  <span className="text-slate-400 font-medium text-lg">°C</span>
+                </div>
+              </div>
+            </div>
+            <button 
+              type="submit" 
+              disabled={submitLoading || !account || account.toLowerCase() !== loggerAddress.toLowerCase()}
+              className="btn-primary w-full flex justify-center py-3 text-lg"
+            >
+              {submitLoading ? <Loader /> : 'Submit Reading'}
+            </button>
+          </form>
+        </div>
       )}
     </div>
   );
