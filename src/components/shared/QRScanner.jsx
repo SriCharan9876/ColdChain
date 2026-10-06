@@ -1,13 +1,11 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import jsQR from 'jsqr';
+import { Scanner } from '@yudiel/react-qr-scanner';
 
 export default function QRScanner({ onScan }) {
   const [scanError, setScanError] = useState('');
   const [isCameraActive, setIsCameraActive] = useState(false);
   const fileInputRef = useRef(null);
-  const videoRef = useRef(null);
-  const streamRef = useRef(null);
-  const animationFrameId = useRef(null);
 
   // Helper to decode QR from an HTML Canvas with multi-resolution fallback
   const decodeCanvas = (canvas) => {
@@ -25,7 +23,7 @@ export default function QRScanner({ onScan }) {
     });
     if (code && code.data) return code.data;
 
-    // If image is very large, downscale to max 800px for jsQR matrix scan
+    // Downscale fallback for large images
     const maxDim = Math.max(canvas.width, canvas.height);
     if (maxDim > 800) {
       const scale = 800 / maxDim;
@@ -51,6 +49,8 @@ export default function QRScanner({ onScan }) {
     if (!file) return;
 
     setScanError('');
+    setIsCameraActive(false);
+
     const reader = new FileReader();
     reader.onload = (evt) => {
       const img = new Image();
@@ -73,67 +73,15 @@ export default function QRScanner({ onScan }) {
     reader.readAsDataURL(file);
   };
 
-  // Live Camera Scan Loop
-  const scanCameraFrame = () => {
-    if (videoRef.current && videoRef.current.readyState === videoRef.current.HAVE_ENOUGH_DATA) {
-      const canvas = document.createElement('canvas');
-      canvas.width = videoRef.current.videoWidth;
-      canvas.height = videoRef.current.videoHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const code = jsQR(imageData.data, imageData.width, imageData.height, {
-        inversionAttempts: 'dontInvert'
-      });
-
-      if (code && code.data) {
-        stopCamera();
-        onScan(code.data);
-        return;
-      }
-    }
-    animationFrameId.current = requestAnimationFrame(scanCameraFrame);
-  };
-
-  const startCamera = async () => {
-    setScanError('');
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' }
-      });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.setAttribute('playsinline', true);
-        videoRef.current.play();
-      }
-      setIsCameraActive(true);
-      animationFrameId.current = requestAnimationFrame(scanCameraFrame);
-    } catch (err) {
-      console.error('Camera access error:', err);
-      setScanError('Unable to access camera. Please check camera permissions or upload an image file.');
+  const handleCameraScan = (result) => {
+    if (result && result.length > 0) {
+      setIsCameraActive(false);
+      onScan(result[0].rawValue);
     }
   };
-
-  const stopCamera = () => {
-    if (animationFrameId.current) {
-      cancelAnimationFrame(animationFrameId.current);
-    }
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-    setIsCameraActive(false);
-  };
-
-  useEffect(() => {
-    return () => {
-      stopCamera();
-    };
-  }, []);
 
   return (
-    <div style={{ margin: '1rem 0', textAlign: 'center' }}>
+    <div style={{ margin: '1rem 0', textAlign: 'center', width: '100%' }}>
       <input 
         type="file" 
         accept="image/*" 
@@ -146,7 +94,10 @@ export default function QRScanner({ onScan }) {
         {!isCameraActive ? (
           <button 
             type="button" 
-            onClick={startCamera}
+            onClick={() => {
+              setScanError('');
+              setIsCameraActive(true);
+            }}
             style={{ 
               padding: '0.6rem 1.2rem', 
               background: '#28a745', 
@@ -163,7 +114,7 @@ export default function QRScanner({ onScan }) {
         ) : (
           <button 
             type="button" 
-            onClick={stopCamera}
+            onClick={() => setIsCameraActive(false)}
             style={{ 
               padding: '0.6rem 1.2rem', 
               background: '#dc3545', 
@@ -198,34 +149,25 @@ export default function QRScanner({ onScan }) {
       </div>
 
       {isCameraActive && (
-        <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div style={{ 
-            position: 'relative', 
-            width: '100%', 
-            maxWidth: '320px', 
-            borderRadius: '8px', 
-            overflow: 'hidden',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-            border: '2px solid #28a745'
-          }}>
-            <video 
-              ref={videoRef} 
-              style={{ width: '100%', height: 'auto', display: 'block' }} 
-            />
-            <div style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              border: '2px dashed rgba(255,255,255,0.8)',
-              margin: '20px',
-              pointerEvents: 'none'
-            }} />
-          </div>
-          <span style={{ fontSize: '0.85rem', color: '#555', marginTop: '0.5rem' }}>
-            Point your camera at a Medicine QR code
-          </span>
+        <div style={{ 
+          marginTop: '1rem', 
+          width: '100%', 
+          maxWidth: '350px', 
+          margin: '1rem auto 0 auto',
+          borderRadius: '8px', 
+          overflow: 'hidden',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          border: '2px solid #28a745'
+        }}>
+          <Scanner 
+            onScan={handleCameraScan} 
+            onError={(err) => {
+              console.error(err);
+              setScanError('Camera error: Unable to access device camera.');
+              setIsCameraActive(false);
+            }}
+            formats={['qr_code']}
+          />
         </div>
       )}
 
